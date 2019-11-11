@@ -44,11 +44,11 @@ class MainActivity : AppCompatActivity() {
 
         //進むボタン
         next_button.setOnClickListener {
-            if (image.size.toInt() > i) {
+            if (image.size.toInt()-1 > i) {
                 //添字に1を足して画像を表示
                 i += 1
                 imageView.setImageURI(image[i])
-            } else if (image.size.toInt() == i){
+            } else if (image.size.toInt()-1 == i ){
                 //添字を0に戻して画像を表示
                 i = 0
                 imageView.setImageURI(image[i])
@@ -60,12 +60,12 @@ class MainActivity : AppCompatActivity() {
 
         //戻るボタン
         back_button.setOnClickListener {
-            if (image.size.toInt() < i) {
+            if (image.size.toInt()-1 <= i && i != 0) {
                 //添字に1を引いて画像を表示
                 i -= 1
                 imageView.setImageURI(image[i])
-            } else if (image.size.toInt() == 0){
-                i = image.size.toInt()
+            } else if (i == 0){
+                i = image.size.toInt()-1
                 imageView.setImageURI(image[i])
             }
 
