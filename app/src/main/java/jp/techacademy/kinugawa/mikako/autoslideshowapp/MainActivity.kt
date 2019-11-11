@@ -58,9 +58,9 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        //戻るボタン
+        //戻るボタン　iが0の時だけ特別扱いで書き直し予定
         back_button.setOnClickListener {
-            if (image.size.toInt()-1 <= i && i != 0) {
+            if (image.size.toInt()-1 >= i && i != 0) {
                 //添字に1を引いて画像を表示
                 i -= 1
                 imageView.setImageURI(image[i])
