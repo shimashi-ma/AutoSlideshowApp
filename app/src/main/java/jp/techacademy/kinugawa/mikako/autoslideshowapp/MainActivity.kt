@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     //パーミッション用
     private val PERMISSIONS_REQUEST_CODE = 100
 
+    var image = mutableListOf<Uri>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -35,6 +37,48 @@ class MainActivity : AppCompatActivity() {
         } else {
             getContentsInfo()
         }
+
+        //添字用
+        var sum = image.indices.toString()
+        var number = sum.toInt()
+
+        //進むボタン
+        next_button.setOnClickListener {
+            if (image.size > number) {
+                //添字に1を足して画像を表示
+                number += 1
+                imageView.setImageURI(image[number])
+            } else if (image.size == number){
+                //添字を0に戻して画像を表示
+                number = 0
+                imageView.setImageURI(image[number])
+            }
+
+            Log.d("ANDROID", "URI : " + image[number].toString())
+
+        }
+
+        //戻るボタン
+        back_button.setOnClickListener {
+            if (image.size < number) {
+                //添字に1を引いて画像を表示
+                number -= 1
+                imageView.setImageURI(image[number])
+            } else if (image.size == 0){
+                number = image.size
+                imageView.setImageURI(image[number])
+            }
+
+            Log.d("ANDROID", "URI : " + image[number].toString())
+
+        }
+
+        //スライドショーボタン
+        slide_button.setOnClickListener {
+
+        }
+
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -63,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         var imageUri :Uri?
 
-        var image = mutableListOf<Uri>()
+        //var image = mutableListOf<Uri>()
 
         if (cursor!!.moveToFirst()) {
             do {
@@ -75,7 +119,9 @@ class MainActivity : AppCompatActivity() {
                 Log.d("ANDROID", "URI : " + imageUri!!.toString())
 
                 //取得したimageUriを書き込み可能なMutableListに代入 。インデックス番号使いたいから。
-                image = mutableListOf(imageUri)
+                //image = mutableListOf(imageUri)
+
+                image.add(imageUri)
 
             } while (cursor.moveToNext())
 
