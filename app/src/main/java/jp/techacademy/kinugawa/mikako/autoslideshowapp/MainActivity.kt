@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     //パーミッション用
     private val PERMISSIONS_REQUEST_CODE = 100
 
+    //画像のURIを格納するためのリスト
     var image = mutableListOf<Uri>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,37 +40,36 @@ class MainActivity : AppCompatActivity() {
         }
 
         //添字用
-        var sum = image.indices.toString()
-        var number = sum.toInt()
+        var i = 0
 
         //進むボタン
         next_button.setOnClickListener {
-            if (image.size > number) {
+            if (image.size.toInt() > i) {
                 //添字に1を足して画像を表示
-                number += 1
-                imageView.setImageURI(image[number])
-            } else if (image.size == number){
+                i += 1
+                imageView.setImageURI(image[i])
+            } else if (image.size.toInt() == i){
                 //添字を0に戻して画像を表示
-                number = 0
-                imageView.setImageURI(image[number])
+                i = 0
+                imageView.setImageURI(image[i])
             }
 
-            Log.d("ANDROID", "URI : " + image[number].toString())
+            Log.d("ANDROID", "URI : " + image[i].toString())
 
         }
 
         //戻るボタン
         back_button.setOnClickListener {
-            if (image.size < number) {
+            if (image.size.toInt() < i) {
                 //添字に1を引いて画像を表示
-                number -= 1
-                imageView.setImageURI(image[number])
-            } else if (image.size == 0){
-                number = image.size
-                imageView.setImageURI(image[number])
+                i -= 1
+                imageView.setImageURI(image[i])
+            } else if (image.size.toInt() == 0){
+                i = image.size.toInt()
+                imageView.setImageURI(image[i])
             }
 
-            Log.d("ANDROID", "URI : " + image[number].toString())
+            Log.d("ANDROID", "URI : " + image.size.toString())
 
         }
 
@@ -107,8 +107,6 @@ class MainActivity : AppCompatActivity() {
 
         var imageUri :Uri?
 
-        //var image = mutableListOf<Uri>()
-
         if (cursor!!.moveToFirst()) {
             do {
                 // indexからIDを取得し、そのIDから画像のURIを取得する
@@ -118,9 +116,7 @@ class MainActivity : AppCompatActivity() {
 
                 Log.d("ANDROID", "URI : " + imageUri!!.toString())
 
-                //取得したimageUriを書き込み可能なMutableListに代入 。インデックス番号使いたいから。
-                //image = mutableListOf(imageUri)
-
+                //imageリストに格納していく
                 image.add(imageUri)
 
             } while (cursor.moveToNext())
