@@ -90,8 +90,6 @@ class MainActivity : AppCompatActivity() {
         //自動送りボタン
         slide_button.setOnClickListener {
 
-
-
             if (mTimer == null){
 
                 // タイマーの作成
@@ -114,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                 mTimer!!.cancel()
 
                 //nullに戻しておく
-                mTimer == null
+                mTimer = null
 
                 //進む・戻るボタンをタップできるようにする
                 next_button.isEnabled = true
@@ -126,7 +124,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-
 
     }
 
