@@ -9,7 +9,11 @@ import android.util.Log
 import android.provider.MediaStore
 import android.content.ContentUris
 import android.net.Uri
+import android.os.Handler
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import android.support.design.widget.Snackbar
+import android.view.View
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +22,16 @@ class MainActivity : AppCompatActivity() {
 
     //画像のURIを格納するためのリスト
     var image = mutableListOf<Uri>()
+
+    //画像のインデックス番号用
+    var numbers = 0
+
+    //タイマー
+    private var mTimer: Timer? = null
+
+    //Handlerインスタンス作成 スレッドを超えて依頼をする用
+    private var mHandler = Handler()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,45 +53,103 @@ class MainActivity : AppCompatActivity() {
             getContentsInfo()
         }
 
-        //添字用
-        var i = 0
 
         //進むボタン
         next_button.setOnClickListener {
-            if (image.size.toInt()-1 > i) {
+            if (image.size.toInt()-1 > numbers) {
                 //添字に1を足して画像を表示
-                i += 1
-                imageView.setImageURI(image[i])
-            } else if (image.size.toInt()-1 == i ){
+                numbers += 1
+                imageView.setImageURI(image[numbers])
+            } else if (image.size.toInt()-1 == numbers ){
                 //添字を0に戻して画像を表示
-                i = 0
-                imageView.setImageURI(image[i])
+                numbers = 0
+                imageView.setImageURI(image[numbers])
             }
 
-            Log.d("ANDROID", "URI : " + image[i].toString())
+            Log.d("ANDROID", "URI : " + image[numbers].toString())
 
         }
 
         //戻るボタン　iが0の時だけ特別扱いで書き直し予定
         back_button.setOnClickListener {
-            if (image.size.toInt()-1 >= i && i != 0) {
+            if (image.size.toInt()-1 >= numbers && numbers != 0) {
                 //添字に1を引いて画像を表示
-                i -= 1
-                imageView.setImageURI(image[i])
-            } else if (i == 0){
-                i = image.size.toInt()-1
-                imageView.setImageURI(image[i])
+                numbers -= 1
+                imageView.setImageURI(image[numbers])
+            } else if (numbers == 0){
+                numbers = image.size.toInt()-1
+                imageView.setImageURI(image[numbers])
             }
 
             Log.d("ANDROID", "URI : " + image.size.toString())
 
         }
 
-        //スライドショーボタン
+
+
+        //自動送りボタン
         slide_button.setOnClickListener {
+
+
+
+            if (mTimer == null){
+
+                // タイマーの作成
+                mTimer = Timer()
+
+                //自動送りはじめる
+                slid_start()
+
+                //進む・戻るボタンをタップ無効にする　+ 文字のグレーアウト
+                next_button.isEnabled = false
+                back_button.isEnabled = false
+
+                //自動送りボタン表記を「停止」にしておく
+                slide_button.text = "停止"
+
+
+            } else if (mTimer != null){
+
+                //止める
+                mTimer!!.cancel()
+
+                //nullに戻しておく
+                mTimer == null
+
+                //進む・戻るボタンをタップできるようにする
+                next_button.isEnabled = true
+                back_button.isEnabled = true
+
+                //自動送りボタン表記を「再生」にしておく
+                slide_button.text = "再生"
+
+            }
 
         }
 
+
+    }
+
+
+    //2秒毎に自動送りをはじめる関数をまとめておく　slid_start()
+    fun slid_start() {
+        // タイマーの始動
+        mTimer!!.schedule(object : TimerTask() {
+            override fun run() {
+
+                mHandler.post {
+                    if (image.size.toInt()-1 > numbers) {
+                        //添字に1を足して画像を表示
+                        numbers += 1
+                        imageView.setImageURI(image[numbers])
+                    } else if (image.size.toInt()-1 == numbers ){
+                        //添字を0に戻して画像を表示
+                        numbers = 0
+                        imageView.setImageURI(image[numbers])
+                    }
+                }
+            }
+        }, 100, 2000) // 最初に始動させるまで 秒、ループの間隔を 秒 に設定
 
     }
 
@@ -89,6 +161,17 @@ class MainActivity : AppCompatActivity() {
                     getContentsInfo()
                 } else {
                     Log.d("ANDROID", "許可されなかった")
+
+                    //進む・戻る・自動送りボタンをタップ無効にする　+ 文字のグレーアウト
+                    next_button.isEnabled = false
+                    back_button.isEnabled = false
+                    slide_button.isEnabled = false
+
+                    Snackbar.make(this.imageView, "画像を表示できませんでした", Snackbar.LENGTH_SHORT)
+                            //.setAction("Action", null)  //いらない？
+                            .show()
+                    return
+
                 }
         }
 
