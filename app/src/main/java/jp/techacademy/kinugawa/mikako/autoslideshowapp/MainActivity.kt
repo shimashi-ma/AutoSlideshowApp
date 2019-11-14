@@ -13,7 +13,6 @@ import android.os.Handler
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import android.support.design.widget.Snackbar
-import android.view.View
 
 class MainActivity : AppCompatActivity() {
 
@@ -57,34 +56,30 @@ class MainActivity : AppCompatActivity() {
         //進むボタン
         next_button.setOnClickListener {
             if (image.size.toInt()-1 > numbers) {
-                //添字に1を足して画像を表示
+                //次の画像を表示
                 numbers += 1
                 imageView.setImageURI(image[numbers])
             } else if (image.size.toInt()-1 == numbers ){
-                //添字を0に戻して画像を表示
+                //1枚目の画像を表示
                 numbers = 0
                 imageView.setImageURI(image[numbers])
             }
-
             Log.d("ANDROID", "URI : " + image[numbers].toString())
-
         }
 
-        //戻るボタン　iが0の時だけ特別扱いで書き直し予定
+        //戻るボタン　
         back_button.setOnClickListener {
-            if (image.size.toInt()-1 >= numbers && numbers != 0) {
-                //添字に1を引いて画像を表示
-                numbers -= 1
-                imageView.setImageURI(image[numbers])
-            } else if (numbers == 0){
+            if (numbers == 0) {
+                //最後の画像を表示
                 numbers = image.size.toInt()-1
                 imageView.setImageURI(image[numbers])
+            } else {
+                //ひとつ前の画像を表示
+                numbers -= 1
+                imageView.setImageURI(image[numbers])
             }
-
             Log.d("ANDROID", "URI : " + image.size.toString())
-
         }
-
 
 
         //自動送りボタン
@@ -96,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                 mTimer = Timer()
 
                 //自動送りはじめる
-                slid_start()
+                slide_start()
 
                 //進む・戻るボタンをタップ無効にする　+ 文字のグレーアウト
                 next_button.isEnabled = false
@@ -128,25 +123,25 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    //2秒毎に自動送りをはじめる関数をまとめておく　slid_start()
-    fun slid_start() {
+    //2秒毎に自動送りをはじめる再利用可能な関数　slide_start()
+    fun slide_start() {
         // タイマーの始動
         mTimer!!.schedule(object : TimerTask() {
             override fun run() {
 
                 mHandler.post {
                     if (image.size.toInt()-1 > numbers) {
-                        //添字に1を足して画像を表示
+                        //次の画像を表示
                         numbers += 1
                         imageView.setImageURI(image[numbers])
                     } else if (image.size.toInt()-1 == numbers ){
-                        //添字を0に戻して画像を表示
+                        //1枚目の画像を表示
                         numbers = 0
                         imageView.setImageURI(image[numbers])
                     }
                 }
             }
-        }, 100, 2000) // 最初に始動させるまで 秒、ループの間隔を 秒 に設定
+        }, 100, 2000) // 最初に始動させるまで0.1秒、ループの間隔を2秒 に設定
 
     }
 
@@ -164,14 +159,11 @@ class MainActivity : AppCompatActivity() {
                     back_button.isEnabled = false
                     slide_button.isEnabled = false
 
-                    Snackbar.make(this.imageView, "画像を表示できませんでした", Snackbar.LENGTH_SHORT)
-                            //.setAction("Action", null)  //いらない？
-                            .show()
-                    return
+                    Snackbar.make(this.imageView, "画像を表示できませんでした", Snackbar.LENGTH_SHORT).show()
 
+                    return
                 }
         }
-
     }
 
     private fun getContentsInfo() {
@@ -185,14 +177,13 @@ class MainActivity : AppCompatActivity() {
                 null // ソート (null ソートなし)
         )
 
-        var imageUri :Uri?
 
         if (cursor!!.moveToFirst()) {
             do {
                 // indexからIDを取得し、そのIDから画像のURIを取得する
                 val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
                 val id = cursor.getLong(fieldIndex)
-                imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                val imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
                 Log.d("ANDROID", "URI : " + imageUri!!.toString())
 
